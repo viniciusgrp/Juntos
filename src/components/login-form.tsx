@@ -5,17 +5,18 @@ import { useForm, Controller } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import {
-  TextField,
-  Button,
   Box,
-  Typography,
   Card,
   CardContent,
+  TextField,
+  Button,
+  Typography,
   FormControlLabel,
   Checkbox,
-  IconButton,
-  InputAdornment,
+  Link,
   Alert,
+  InputAdornment,
+  IconButton,
   CircularProgress
 } from '@mui/material'
 import { Visibility, VisibilityOff } from '@mui/icons-material'
@@ -82,11 +83,11 @@ export default function LoginForm({ onToggleMode }: LoginFormProps) {
 
           {loginMutation.isError && (
             <Alert severity="error" sx={{ mb: 3 }}>
-              Credenciais inválidas. Verifique seu email e senha.
+              Erro ao fazer login. Verifique suas credenciais.
             </Alert>
           )}
 
-          <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ space: 3 }}>
+          <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
             <Controller
               name="email"
               control={control}
@@ -96,11 +97,10 @@ export default function LoginForm({ onToggleMode }: LoginFormProps) {
                   fullWidth
                   label="Email"
                   type="email"
-                  placeholder="seu@email.com"
+                  margin="normal"
                   error={!!errors.email}
                   helperText={errors.email?.message}
-                  margin="normal"
-                  variant="outlined"
+                  autoComplete="email"
                 />
               )}
             />
@@ -114,18 +114,16 @@ export default function LoginForm({ onToggleMode }: LoginFormProps) {
                   fullWidth
                   label="Senha"
                   type={showPassword ? 'text' : 'password'}
-                  placeholder="Sua senha"
+                  margin="normal"
                   error={!!errors.password}
                   helperText={errors.password?.message}
-                  margin="normal"
-                  variant="outlined"
+                  autoComplete="current-password"
                   InputProps={{
                     endAdornment: (
                       <InputAdornment position="end">
                         <IconButton
                           onClick={() => setShowPassword(!showPassword)}
                           edge="end"
-                          aria-label="toggle password visibility"
                         >
                           {showPassword ? <VisibilityOff /> : <Visibility />}
                         </IconButton>
@@ -136,57 +134,58 @@ export default function LoginForm({ onToggleMode }: LoginFormProps) {
               )}
             />
 
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2, mb: 3 }}>
-              <Controller
-                name="rememberMe"
-                control={control}
-                render={({ field }) => (
-                  <FormControlLabel
-                    control={<Checkbox {...field} color="primary" />}
-                    label="Lembrar de mim"
-                  />
-                )}
-              />
-
-              <Button
-                variant="text"
-                size="small"
-                sx={{ textTransform: 'none' }}
-              >
-                Esqueceu a senha?
-              </Button>
-            </Box>
+            <Controller
+              name="rememberMe"
+              control={control}
+              render={({ field }) => (
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      {...field}
+                      checked={field.value || false}
+                      color="primary"
+                    />
+                  }
+                  label="Lembrar de mim"
+                  sx={{ mt: 1, mb: 2 }}
+                />
+              )}
+            />
 
             <Button
               type="submit"
               fullWidth
               variant="contained"
               size="large"
-              disabled={isSubmitting || loginMutation.isPending}
-              sx={{ mt: 2, py: 1.5 }}
+              disabled={isSubmitting}
+              sx={{ mt: 3, mb: 2, py: 1.5 }}
             >
-              {loginMutation.isPending ? (
-                <>
-                  <CircularProgress size={20} sx={{ mr: 1 }} />
-                  Entrando...
-                </>
+              {isSubmitting ? (
+                <CircularProgress size={24} color="inherit" />
               ) : (
                 'Entrar'
               )}
             </Button>
-          </Box>
 
-          <Box sx={{ textAlign: 'center', mt: 3 }}>
-            <Typography variant="body2" color="text.secondary">
-              Não possui uma conta?{' '}
-              <Button
-                variant="text"
-                onClick={onToggleMode}
-                sx={{ textTransform: 'none', p: 0, minWidth: 'auto' }}
-              >
-                Criar conta
-              </Button>
-            </Typography>
+            <Box sx={{ textAlign: 'center', mt: 2 }}>
+              <Link href="#" variant="body2" color="primary">
+                Esqueceu sua senha?
+              </Link>
+            </Box>
+
+            <Box sx={{ textAlign: 'center', mt: 3 }}>
+              <Typography variant="body2" color="text.secondary">
+                Não possui uma conta?{' '}
+                <Link
+                  component="button"
+                  variant="body2"
+                  onClick={onToggleMode}
+                  sx={{ cursor: 'pointer' }}
+                >
+                  Cadastre-se
+                </Link>
+              </Typography>
+            </Box>
           </Box>
         </CardContent>
       </Card>

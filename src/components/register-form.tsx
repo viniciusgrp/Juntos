@@ -5,19 +5,19 @@ import { useForm, Controller } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import {
-  TextField,
-  Button,
   Box,
-  Typography,
   Card,
   CardContent,
+  TextField,
+  Button,
+  Typography,
   FormControlLabel,
   Checkbox,
-  IconButton,
-  InputAdornment,
+  Link,
   Alert,
-  CircularProgress,
-  Link
+  InputAdornment,
+  IconButton,
+  CircularProgress
 } from '@mui/material'
 import { Visibility, VisibilityOff } from '@mui/icons-material'
 import { useRegister } from '@/hooks/use-auth'
@@ -31,7 +31,7 @@ interface RegisterFormData {
   email: string
   password: string
   confirmPassword: string
-  agreeTerms: boolean
+  acceptTerms: boolean
 }
 
 const registerSchema = yup.object().shape({
@@ -50,11 +50,11 @@ const registerSchema = yup.object().shape({
   confirmPassword: yup
     .string()
     .required('Confirmação de senha é obrigatória')
-    .oneOf([yup.ref('password')], 'As senhas não coincidem'),
-  agreeTerms: yup
+    .oneOf([yup.ref('password')], 'Senhas devem ser iguais'),
+  acceptTerms: yup
     .boolean()
-    .required('Você deve concordar com os termos de uso')
-    .oneOf([true], 'Você deve concordar com os termos de uso')
+    .required('Você deve aceitar os termos de uso')
+    .oneOf([true], 'Você deve aceitar os termos de uso')
 })
 
 export default function RegisterForm({ onToggleMode }: RegisterFormProps) {
@@ -73,7 +73,7 @@ export default function RegisterForm({ onToggleMode }: RegisterFormProps) {
       email: '',
       password: '',
       confirmPassword: '',
-      agreeTerms: false
+      acceptTerms: false
     }
   })
 
@@ -89,22 +89,22 @@ export default function RegisterForm({ onToggleMode }: RegisterFormProps) {
     <Box sx={{ width: '100%', maxWidth: 400, mx: 'auto' }}>
       <Card elevation={3}>
         <CardContent sx={{ p: 4 }}>
-          <Box sx={{ textAlign: 'center', mb: 3 }}>
+          <Box sx={{ textAlign: 'center', mb: 4 }}>
             <Typography variant="h4" component="h1" gutterBottom fontWeight="bold">
-              Criar conta
+              Criar Conta
             </Typography>
             <Typography variant="body1" color="text.secondary">
-              Preencha os dados para criar sua conta
+              Preencha os dados para se cadastrar
             </Typography>
           </Box>
 
           {registerMutation.isError && (
             <Alert severity="error" sx={{ mb: 3 }}>
-              Erro ao criar conta. Verifique os dados e tente novamente.
+              Erro ao criar conta. Tente novamente.
             </Alert>
           )}
 
-          <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ space: 2 }}>
+          <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
             <Controller
               name="name"
               control={control}
@@ -113,11 +113,10 @@ export default function RegisterForm({ onToggleMode }: RegisterFormProps) {
                   {...field}
                   fullWidth
                   label="Nome completo"
-                  placeholder="Seu nome completo"
+                  margin="normal"
                   error={!!errors.name}
                   helperText={errors.name?.message}
-                  margin="normal"
-                  variant="outlined"
+                  autoComplete="name"
                 />
               )}
             />
@@ -131,11 +130,10 @@ export default function RegisterForm({ onToggleMode }: RegisterFormProps) {
                   fullWidth
                   label="Email"
                   type="email"
-                  placeholder="seu@email.com"
+                  margin="normal"
                   error={!!errors.email}
                   helperText={errors.email?.message}
-                  margin="normal"
-                  variant="outlined"
+                  autoComplete="email"
                 />
               )}
             />
@@ -149,18 +147,16 @@ export default function RegisterForm({ onToggleMode }: RegisterFormProps) {
                   fullWidth
                   label="Senha"
                   type={showPassword ? 'text' : 'password'}
-                  placeholder="Sua senha"
+                  margin="normal"
                   error={!!errors.password}
                   helperText={errors.password?.message}
-                  margin="normal"
-                  variant="outlined"
+                  autoComplete="new-password"
                   InputProps={{
                     endAdornment: (
                       <InputAdornment position="end">
                         <IconButton
                           onClick={() => setShowPassword(!showPassword)}
                           edge="end"
-                          aria-label="toggle password visibility"
                         >
                           {showPassword ? <VisibilityOff /> : <Visibility />}
                         </IconButton>
@@ -180,18 +176,16 @@ export default function RegisterForm({ onToggleMode }: RegisterFormProps) {
                   fullWidth
                   label="Confirmar senha"
                   type={showConfirmPassword ? 'text' : 'password'}
-                  placeholder="Confirme sua senha"
+                  margin="normal"
                   error={!!errors.confirmPassword}
                   helperText={errors.confirmPassword?.message}
-                  margin="normal"
-                  variant="outlined"
+                  autoComplete="new-password"
                   InputProps={{
                     endAdornment: (
                       <InputAdornment position="end">
                         <IconButton
                           onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                           edge="end"
-                          aria-label="toggle password visibility"
                         >
                           {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
                         </IconButton>
@@ -202,72 +196,69 @@ export default function RegisterForm({ onToggleMode }: RegisterFormProps) {
               )}
             />
 
-            <Box sx={{ mt: 2, mb: 3 }}>
-              <Controller
-                name="agreeTerms"
-                control={control}
-                render={({ field }) => (
-                  <FormControlLabel
-                    control={
-                      <Checkbox 
-                        {...field} 
-                        color="primary"
-                        sx={{ alignSelf: 'flex-start', mt: -0.5 }}
-                      />
-                    }
-                    label={
-                      <Typography variant="body2">
-                        Eu concordo com os{' '}
-                        <Link component="button" type="button" underline="hover">
-                          termos de uso
-                        </Link>
-                        {' '}e{' '}
-                        <Link component="button" type="button" underline="hover">
-                          política de privacidade
-                        </Link>
-                      </Typography>
-                    }
-                    sx={{ alignItems: 'flex-start' }}
-                  />
-                )}
-              />
-              {errors.agreeTerms && (
-                <Typography variant="caption" color="error" sx={{ ml: 4, display: 'block' }}>
-                  {errors.agreeTerms.message}
-                </Typography>
+            <Controller
+              name="acceptTerms"
+              control={control}
+              render={({ field }) => (
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      {...field}
+                      checked={field.value || false}
+                      color="primary"
+                    />
+                  }
+                  label={
+                    <Typography variant="body2">
+                      Aceito os{' '}
+                      <Link href="#" color="primary">
+                        termos de uso
+                      </Link>{' '}
+                      e{' '}
+                      <Link href="#" color="primary">
+                        política de privacidade
+                      </Link>
+                    </Typography>
+                  }
+                  sx={{ mt: 1, mb: 2, alignItems: 'flex-start' }}
+                />
               )}
-            </Box>
+            />
+
+            {errors.acceptTerms && (
+              <Typography variant="body2" color="error" sx={{ mt: 1, mb: 2 }}>
+                {errors.acceptTerms.message}
+              </Typography>
+            )}
 
             <Button
               type="submit"
               fullWidth
               variant="contained"
               size="large"
-              disabled={isSubmitting || registerMutation.isPending}
-              sx={{ mt: 2, py: 1.5 }}
+              disabled={isSubmitting}
+              sx={{ mt: 3, mb: 2, py: 1.5 }}
             >
-              {registerMutation.isPending ? (
-                <>
-                  <CircularProgress size={20} sx={{ mr: 1 }} />
-                  Criando conta...
-                </>
+              {isSubmitting ? (
+                <CircularProgress size={24} color="inherit" />
               ) : (
-                'Criar conta'
+                'Criar Conta'
               )}
             </Button>
-          </Box>
 
-          <Box sx={{ textAlign: 'center', mt: 3 }}>
-            <Typography variant="body2" color="text.secondary">
-              Já possui uma conta?{' '}
-              <Button
-                variant="text"
-                onClick={onToggleMode}
-                sx={{ textTransform: 'none', p: 0, minWidth: 'auto' }}
-              >
-                Fazer login
-              </Button>
-            </Typography>
+            <Box sx={{ textAlign: 'center', mt: 3 }}>
+              <Typography variant="body2" color="text.secondary">
+                Já possui uma conta?{' '}
+                <Link
+                  component="button"
+                  variant="body2"
+                  onClick={onToggleMode}
+                  sx={{ cursor: 'pointer' }}
+                >
+                  Faça login
+                </Link>
+              </Typography>
+            </Box>
           </Box>
         </CardContent>
       </Card>
