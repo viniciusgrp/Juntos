@@ -29,14 +29,12 @@ export default function AuthPage() {
         py: 4,
       }}
     >
-      {/* Theme Toggle */}
       <Box sx={{ position: "absolute", top: 16, right: 16, zIndex: 10 }}>
         <ThemeToggle />
       </Box>
 
       <Container maxWidth="sm">
         <Box sx={{ textAlign: "center", mb: 4 }}>
-          {/* Logo/Brand */}
           <Avatar
             sx={{
               width: 64,
@@ -58,14 +56,12 @@ export default function AuthPage() {
           </Typography>
         </Box>
 
-        {/* Auth Forms */}
         <Fade in={true} timeout={300}>
           <Box>
             {isLogin ? <LoginForm onToggleMode={toggleMode} /> : <RegisterForm onToggleMode={toggleMode} />}
           </Box>
         </Fade>
 
-        {/* Footer */}
         <Box sx={{ textAlign: "center", mt: 4 }}>
           <Typography variant="body2" color="text.secondary">
             © 2025 Juntos. Todos os direitos reservados.
