@@ -1,17 +1,12 @@
 import { create } from 'zustand'
-
-interface User {
-  id: string
-  name: string
-  email: string
-  avatar?: string
-}
+import { User } from '@/types'
 
 interface AuthState {
   user: User | null
   token: string | null
+  refreshToken: string | null
   isAuthenticated: boolean
-  login: (user: User, token: string) => void
+  login: (user: User, token: string, refreshToken?: string) => void
   logout: () => void
   updateUser: (user: Partial<User>) => void
 }
@@ -19,15 +14,20 @@ interface AuthState {
 export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   token: null,
+  refreshToken: null,
   isAuthenticated: false,
   
-  login: (user: User, token: string) => {
+  login: (user: User, token: string, refreshToken?: string) => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('token', token)
+      if (refreshToken) {
+        localStorage.setItem('refreshToken', refreshToken)
+      }
     }
     set({
       user,
       token,
+      refreshToken,
       isAuthenticated: true,
     })
   },
@@ -35,10 +35,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   logout: () => {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('token')
+      localStorage.removeItem('refreshToken')
     }
     set({
       user: null,
       token: null,
+      refreshToken: null,
       isAuthenticated: false,
     })
   },

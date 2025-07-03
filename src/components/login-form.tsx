@@ -83,7 +83,7 @@ export default function LoginForm({ onToggleMode }: LoginFormProps) {
 
           {loginMutation.isError && (
             <Alert severity="error" sx={{ mb: 3 }}>
-              Erro ao fazer login. Verifique suas credenciais.
+              {loginMutation.error?.response?.data?.error || 'Erro ao fazer login. Verifique suas credenciais.'}
             </Alert>
           )}
 
@@ -157,10 +157,10 @@ export default function LoginForm({ onToggleMode }: LoginFormProps) {
               fullWidth
               variant="contained"
               size="large"
-              disabled={isSubmitting}
+              disabled={isSubmitting || loginMutation.isPending}
               sx={{ mt: 3, mb: 2, py: 1.5 }}
             >
-              {isSubmitting ? (
+              {(isSubmitting || loginMutation.isPending) ? (
                 <CircularProgress size={24} color="inherit" />
               ) : (
                 'Entrar'

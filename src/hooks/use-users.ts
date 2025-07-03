@@ -1,13 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { AxiosError } from 'axios'
 import { api } from '@/lib/axios'
-
-interface User {
-  id: string
-  name: string
-  email: string
-  avatar?: string
-}
+import { User } from '@/types'
 
 interface CreateUserData {
   name: string

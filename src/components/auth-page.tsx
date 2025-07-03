@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Box, Container, Typography, Avatar, Fade } from "@mui/material";
-import { Bolt } from "@mui/icons-material";
+import { AttachMoney } from "@mui/icons-material";
 import LoginForm from "./login-form";
 import RegisterForm from "./register-form";
 import ThemeToggle from "@/components/theme-toggle";
@@ -44,14 +44,26 @@ export default function AuthPage() {
               borderRadius: 3,
             }}
           >
-            <Bolt sx={{ fontSize: 32 }} />
+            <AttachMoney sx={{ fontSize: 32 }} />
           </Avatar>
 
-          <Typography variant="h3" component="h1" fontWeight="bold" gutterBottom>
+          <Typography 
+            variant="h3" 
+            component="h1" 
+            fontWeight="bold" 
+            gutterBottom
+            color="primary.main"
+          >
             Juntos
           </Typography>
 
-          <Typography variant="body1" color="text.secondary">
+          <Typography 
+            variant="body1" 
+            sx={{ 
+              color: 'rgba(255, 255, 255, 0.8)',
+              textShadow: '0 1px 2px rgba(0, 0, 0, 0.2)'
+            }}
+          >
             O companheiro das suas finanças
           </Typography>
         </Box>
@@ -63,7 +75,13 @@ export default function AuthPage() {
         </Fade>
 
         <Box sx={{ textAlign: "center", mt: 4 }}>
-          <Typography variant="body2" color="text.secondary">
+          <Typography 
+            variant="body2" 
+            sx={{ 
+              color: 'rgba(255, 255, 255, 0.7)',
+              textShadow: '0 1px 2px rgba(0, 0, 0, 0.2)'
+            }}
+          >
             © 2025 Juntos. Todos os direitos reservados.
           </Typography>
         </Box>

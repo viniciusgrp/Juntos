@@ -100,7 +100,7 @@ export default function RegisterForm({ onToggleMode }: RegisterFormProps) {
 
           {registerMutation.isError && (
             <Alert severity="error" sx={{ mb: 3 }}>
-              Erro ao criar conta. Tente novamente.
+              {registerMutation.error?.response?.data?.error || 'Erro ao criar conta. Tente novamente.'}
             </Alert>
           )}
 
@@ -236,10 +236,10 @@ export default function RegisterForm({ onToggleMode }: RegisterFormProps) {
               fullWidth
               variant="contained"
               size="large"
-              disabled={isSubmitting}
+              disabled={isSubmitting || registerMutation.isPending}
               sx={{ mt: 3, mb: 2, py: 1.5 }}
             >
-              {isSubmitting ? (
+              {(isSubmitting || registerMutation.isPending) ? (
                 <CircularProgress size={24} color="inherit" />
               ) : (
                 'Criar Conta'
