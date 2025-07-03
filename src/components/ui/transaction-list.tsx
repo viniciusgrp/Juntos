@@ -11,7 +11,7 @@ import {
 } from '@mui/material'
 import { ReactNode } from 'react'
 
-interface Transaction {
+interface TransactionListItem {
   id: string | number
   title: string
   description?: string
@@ -24,8 +24,8 @@ interface Transaction {
 
 interface TransactionListProps {
   title: string
-  transactions: Transaction[]
-  getIcon?: (transaction: Transaction) => ReactNode
+  transactions: TransactionListItem[]
+  getIcon?: (transaction: TransactionListItem) => ReactNode
   getColor?: (type: string) => string
   elevation?: number
   maxHeight?: number | string
@@ -39,7 +39,7 @@ const TransactionList = ({
   elevation = 2,
   maxHeight
 }: TransactionListProps) => {
-  const defaultGetIcon = (transaction: Transaction) => {
+  const defaultGetIcon = (transaction: TransactionListItem) => {
     return transaction.icon || <></>
   }
 

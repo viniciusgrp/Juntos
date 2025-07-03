@@ -1,4 +1,3 @@
-// Arquivo central de exportação de tipos
 export * from './api';
 export * from './auth';
 export * from './category';
