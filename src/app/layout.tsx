@@ -4,6 +4,7 @@ import Providers from "@/providers/providers";
 import ThemeToggle from "@/components/theme-toggle";
 import { Box } from "@mui/material";
 import "./globals.css";
+import Script from "next/script";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -61,6 +62,26 @@ export default function RootLayout({
           </Box>
         </Providers>
       </body>
+      <Script
+        async
+        src="https://www.googletagmanager.com/gtag/js?id=G-QMV06XEVLM"
+        strategy="afterInteractive"
+      />
+      <Script
+        id="google-analytics-script"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-QMV06XEVLM', {
+              page_path: window.location.pathname,
+            });
+          `,
+        }}
+      />
+
     </html>
   );
 }
