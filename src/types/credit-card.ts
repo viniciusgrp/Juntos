@@ -1,11 +1,9 @@
-// Tipos para cartões de crédito
 export interface CreditCard {
   id: string;
   name: string;
   limit: number;
-  closingDay: number;
-  dueDay: number;
-  isActive: boolean;
+  closeDate: number;
+  dueDate: number;
   userId: string;
   createdAt: string;
   updatedAt: string;
@@ -14,10 +12,8 @@ export interface CreditCard {
 export interface CreateCreditCardData {
   name: string;
   limit: number;
-  closingDay: number;
-  dueDay: number;
+  closeDate: number;
+  dueDate: number;
 }
 
-export interface UpdateCreditCardData extends Partial<CreateCreditCardData> {
-  isActive?: boolean;
-}
+export type UpdateCreditCardData = Partial<CreateCreditCardData>;
