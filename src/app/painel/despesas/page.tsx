@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
   Box,
   Button,
@@ -31,7 +31,6 @@ import {
 import {
   useExpenses,
   useAllTransactions,
-  useTransactionStats,
   useCreateTransaction,
   useUpdateTransaction,
   useDeleteTransaction,
@@ -41,10 +40,14 @@ import {
 } from '../../../hooks/use-transactions';
 import { useAllAccounts } from '../../../hooks/use-accounts';
 import { useCategories } from '../../../hooks/use-categories';
+import { useCreditCards } from '../../../hooks/use-credit-cards';
 import { Transaction, CreateTransactionData, UpdateTransactionData } from '../../../types/transaction';
+import { CreateCreditCardData } from '../../../types/credit-card';
+import CreditCardFormModal from '../../../components/ui/credit-card-form-modal';
 
 export default function DespesasPage() {
   const { filters, updateFilter, clearFilters } = useTransactionFilters('EXPENSE');
+  
   const { 
     data, 
     isLoading, 
@@ -53,10 +56,54 @@ export default function DespesasPage() {
     hasNextPage, 
     isFetchingNextPage 
   } = useExpenses(filters);
+  
   const { data: allTransactionsData } = useAllTransactions();
-  const { data: statsData, isLoading: statsLoading } = useTransactionStats();
+  
+  const expenseStats = useMemo(() => {
+    if (!data?.pages) {
+      return {
+        totalExpenses: 0,
+        totalPaid: 0,
+        totalPending: 0,
+        currentMonthExpenses: 0,
+        totalIncomes: 0,
+        currentMonthIncomes: 0,
+        balance: 0,
+        topCategories: []
+      };
+    }
+    
+    const allExpenses = data.pages.flatMap(page => page.transactions) || [];
+    
+    const totalExpenses = allExpenses.reduce((sum, t) => sum + t.amount, 0);
+    const totalPaid = allExpenses.filter(t => t.isPaid).reduce((sum, t) => sum + t.amount, 0);
+    const totalPending = allExpenses.filter(t => !t.isPaid).reduce((sum, t) => sum + t.amount, 0);
+    
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    
+    const currentMonthExpenses = allExpenses
+      .filter(t => {
+        const transactionDate = new Date(t.date);
+        return transactionDate >= startOfMonth && transactionDate <= endOfMonth;
+      })
+      .reduce((sum, t) => sum + t.amount, 0);
+    
+    return {
+      totalExpenses,
+      totalPaid,
+      totalPending,
+      currentMonthExpenses,
+      totalIncomes: 0,
+      currentMonthIncomes: 0,
+      balance: 0,
+      topCategories: []
+    };
+  }, [data]);
   const { data: accountsData } = useAllAccounts();
   const { categories } = useCategories({ type: 'EXPENSE' });
+  const { creditCards, createCreditCard } = useCreditCards();
 
   const createTransactionMutation = useCreateTransaction();
   const updateTransactionMutation = useUpdateTransaction();
@@ -67,6 +114,8 @@ export default function DespesasPage() {
   const [formModalOpen, setFormModalOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
+  const [creditCardModalOpen, setCreditCardModalOpen] = useState(false);
+  const [creditCardFormLoading, setCreditCardFormLoading] = useState(false);
 
   const [snackbar, setSnackbar] = useState<{
     open: boolean;
@@ -158,16 +207,24 @@ export default function DespesasPage() {
     }
   };
 
+  const handleCreateCreditCard = async (data: CreateCreditCardData | Partial<CreateCreditCardData>) => {
+    try {
+      setCreditCardFormLoading(true);
+      await createCreditCard(data as CreateCreditCardData);
+      setCreditCardModalOpen(false);
+      showSnackbar('Cartão de crédito criado com sucesso!');
+    } catch (error: any) {
+      showSnackbar(error.message || 'Erro ao criar cartão', 'error');
+    } finally {
+      setCreditCardFormLoading(false);
+    }
+  };
+
   const transactions = data?.pages.flatMap(page => page.transactions) || [];
   const allTransactions = allTransactionsData?.transactions || [];
   const hasTransactions = transactions.length > 0;
   const hasAnyTransactions = allTransactions.filter(t => t.type === 'EXPENSE').length > 0;
   const accounts = accountsData?.accounts || [];
-
-  const creditCards = [
-    { id: '1', name: 'Cartão Principal' },
-    { id: '2', name: 'Cartão Empresarial' }
-  ];
 
   return (
     <Box>
@@ -186,8 +243,8 @@ export default function DespesasPage() {
       </PageHeader>
 
       <TransactionStatsGrid 
-        stats={statsData} 
-        loading={statsLoading}
+        stats={expenseStats} 
+        loading={isLoading}
         type="EXPENSE"
       />
 
@@ -338,6 +395,7 @@ export default function DespesasPage() {
         categories={categories}
         accounts={accounts}
         creditCards={creditCards}
+        onCreateCreditCard={() => setCreditCardModalOpen(true)}
       />
 
       <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
@@ -362,6 +420,13 @@ export default function DespesasPage() {
           </Button>
         </DialogActions>
       </Dialog>
+
+      <CreditCardFormModal
+        open={creditCardModalOpen}
+        onClose={() => setCreditCardModalOpen(false)}
+        onSubmit={handleCreateCreditCard}
+        loading={creditCardFormLoading}
+      />
 
       <Snackbar
         open={snackbar.open}

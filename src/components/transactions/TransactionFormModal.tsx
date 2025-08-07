@@ -17,7 +17,7 @@ import {
   Divider,
   Autocomplete
 } from '@mui/material';
-import { AttachMoney, Close } from '@mui/icons-material';
+import { AttachMoney, Close, Add as AddIcon } from '@mui/icons-material';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -50,6 +50,7 @@ interface TransactionFormModalProps {
   categories?: Category[];
   accounts?: Array<{ id: string; name: string }>;
   creditCards?: Array<{ id: string; name: string }>;
+  onCreateCreditCard?: () => void;
 }
 
 export default function TransactionFormModal({
@@ -62,7 +63,8 @@ export default function TransactionFormModal({
   type,
   categories = [],
   accounts = [],
-  creditCards = []
+  creditCards = [],
+  onCreateCreditCard
 }: TransactionFormModalProps) {
   const isEditing = !!transaction;
 
@@ -318,6 +320,18 @@ export default function TransactionFormModal({
                     </FormControl>
                   )}
                 />
+
+                {onCreateCreditCard && (
+                  <Button
+                    variant="outlined"
+                    startIcon={<AddIcon />}
+                    onClick={onCreateCreditCard}
+                    size="small"
+                    sx={{ alignSelf: 'flex-start', mt: 1 }}
+                  >
+                    Adicionar Novo Cartão
+                  </Button>
+                )}
 
                 {!watchCreditCard && (
                   <Controller
