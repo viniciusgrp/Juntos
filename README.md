@@ -1,4 +1,4 @@
-# Juntos - Gestão Financeira Pessoal
+# Juntos - Gestão Financeira Pessoal - EM DESENVOLVIMENTO - Funcional: Criar usuário, sistema de autenticação, criação de contas bancárias e transações entre contas.
 
 Uma plataforma moderna e intuitiva para gerenciar suas finanças pessoais, criada com foco na simplicidade e funcionalidade.
 
