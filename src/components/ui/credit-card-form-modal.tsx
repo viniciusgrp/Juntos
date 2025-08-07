@@ -124,9 +124,11 @@ export default function CreditCardFormModal({
                 required: 'Limite é obrigatório',
                 min: { value: 1, message: 'Limite deve ser maior que zero' }
               }}
-              render={({ field }) => (
+              render={({ field: { onChange, value, ...field } }) => (
                 <TextField
                   {...field}
+                  value={value}
+                  onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
                   label="Limite"
                   type="number"
                   error={!!errors.limit}
@@ -149,9 +151,11 @@ export default function CreditCardFormModal({
                   min: { value: 1, message: 'Dia deve estar entre 1 e 31' },
                   max: { value: 31, message: 'Dia deve estar entre 1 e 31' }
                 }}
-                render={({ field }) => (
+                render={({ field: { onChange, value, ...field } }) => (
                   <TextField
                     {...field}
+                    value={value}
+                    onChange={(e) => onChange(parseInt(e.target.value) || 1)}
                     select
                     label="Dia de Fechamento"
                     error={!!errors.closeDate}
@@ -175,9 +179,11 @@ export default function CreditCardFormModal({
                   min: { value: 1, message: 'Dia deve estar entre 1 e 31' },
                   max: { value: 31, message: 'Dia deve estar entre 1 e 31' }
                 }}
-                render={({ field }) => (
+                render={({ field: { onChange, value, ...field } }) => (
                   <TextField
                     {...field}
+                    value={value}
+                    onChange={(e) => onChange(parseInt(e.target.value) || 1)}
                     select
                     label="Dia de Vencimento"
                     error={!!errors.dueDate}
