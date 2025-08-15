@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { useEffect, useState } from 'react'
 import MaterialUIThemeProvider from './material-ui-theme-provider'
+import { ToastProvider } from '../contexts/toast.context'
 
 function makeQueryClient() {
   return new QueryClient({
@@ -36,8 +37,10 @@ export default function Providers({
   return (
     <QueryClientProvider client={queryClient}>
       <MaterialUIThemeProvider>
-        {children}
-        {isClient && <ReactQueryDevtools initialIsOpen={false} />}
+        <ToastProvider>
+          {children}
+          {isClient && <ReactQueryDevtools initialIsOpen={false} />}
+        </ToastProvider>
       </MaterialUIThemeProvider>
     </QueryClientProvider>
   )

@@ -4,11 +4,13 @@ import { useRouter } from 'next/navigation'
 import { api } from '@/lib/axios'
 import { useAuthStore } from '@/stores/auth-simple'
 import { LoginData, RegisterData, AuthResponse, ApiResponse } from '@/types'
+import { useToastContext } from '../contexts/toast.context'
 
 export function useLogin() {
   const { login } = useAuthStore()
   const queryClient = useQueryClient()
   const router = useRouter()
+  const { showError, showSuccess } = useToastContext()
 
   return useMutation({
     mutationFn: async (data: LoginData) => {
@@ -21,10 +23,12 @@ export function useLogin() {
     onSuccess: (data) => {
       login(data.user, data.token, data.refreshToken)
       queryClient.clear()
+      showSuccess('Login realizado com sucesso!')
       router.push('/painel')
     },
     onError: (error: AxiosError<ApiResponse<any>>) => {
-      console.error('Erro no login:', error.response?.data?.error || 'Credenciais inválidas')
+      const errorMessage = error.response?.data?.error || 'Credenciais inválidas'
+      showError(errorMessage)
     },
   })
 }
@@ -33,6 +37,7 @@ export function useRegister() {
   const { login } = useAuthStore()
   const queryClient = useQueryClient()
   const router = useRouter()
+  const { showError, showSuccess } = useToastContext()
 
   return useMutation({
     mutationFn: async (data: RegisterData) => {
@@ -46,15 +51,19 @@ export function useRegister() {
       // Fazer login automático após registro
       login(data.user, data.token, data.refreshToken)
       queryClient.clear()
+      showSuccess('Conta criada com sucesso!')
       router.push('/painel')
     },
     onError: (error: AxiosError<ApiResponse<any>>) => {
-      console.error('Erro ao registrar:', error.response?.data?.error || 'Erro no registro')
+      const errorMessage = error.response?.data?.error || 'Erro no registro'
+      showError(errorMessage)
     },
   })
 }
 
 export function useForgotPassword() {
+  const { showError, showSuccess } = useToastContext()
+
   return useMutation({
     mutationFn: async (email: string) => {
       const response = await api.post<ApiResponse<{ message: string }>>('/auth/forgot-password', {
@@ -65,8 +74,12 @@ export function useForgotPassword() {
       }
       throw new Error(response.data.error || 'Erro ao enviar nova senha')
     },
+    onSuccess: () => {
+      showSuccess('Nova senha enviada para seu email!')
+    },
     onError: (error: AxiosError<ApiResponse<any>>) => {
-      console.error('Erro ao enviar nova senha:', error.response?.data?.error || 'Erro ao enviar nova senha')
+      const errorMessage = error.response?.data?.error || 'Erro ao enviar nova senha'
+      showError(errorMessage)
     },
   })
 }

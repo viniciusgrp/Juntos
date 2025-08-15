@@ -17,12 +17,13 @@ import {
   Divider,
   Autocomplete
 } from '@mui/material';
-import { AttachMoney, Close, Add as AddIcon } from '@mui/icons-material';
+import { AttachMoney, Close, Add as AddIcon, EmojiEvents } from '@mui/icons-material';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { Transaction, CreateTransactionData, UpdateTransactionData } from '../../types/transaction';
 import { Category } from '../../types/category';
+import { Goal } from '../../types/goal';
 import { formatCurrencyInput, handleCurrencyInput } from '../../utils/currency';
 import { formatDateForInput, getCurrentDate } from '../../utils/date';
 
@@ -38,7 +39,8 @@ const schema = yup.object({
   }),
   isPaid: yup.boolean().default(true),
   installments: yup.number().min(1).max(999).nullable(),
-  creditCardId: yup.string().nullable()
+  creditCardId: yup.string().nullable(),
+  goalId: yup.string().nullable()
 });
 
 interface TransactionFormModalProps {
@@ -52,6 +54,7 @@ interface TransactionFormModalProps {
   categories?: Category[];
   accounts?: Array<{ id: string; name: string }>;
   creditCards?: Array<{ id: string; name: string }>;
+  goals?: Goal[];
   onCreateCreditCard?: () => void;
 }
 
@@ -66,6 +69,7 @@ export default function TransactionFormModal({
   categories = [],
   accounts = [],
   creditCards = [],
+  goals = [],
   onCreateCreditCard
 }: TransactionFormModalProps) {
   const isEditing = !!transaction;
@@ -91,6 +95,7 @@ export default function TransactionFormModal({
       categoryId: transaction?.categoryId || '',
       accountId: transaction?.accountId || '',
       creditCardId: transaction?.creditCardId || '',
+      goalId: transaction?.goalId || '',
       isPaid: transaction?.isPaid ?? true,
       installments: transaction?.installments || null
     }
@@ -368,27 +373,61 @@ export default function TransactionFormModal({
 
             {/* Para receitas, sempre exibe o campo de conta */}
             {type === 'INCOME' && (
-              <Controller
-                name="accountId"
-                control={control}
-                render={({ field }) => (
-                  <FormControl fullWidth error={!!errors.accountId}>
-                    <InputLabel>Conta</InputLabel>
-                    <Select {...field} label="Conta">
-                      {accounts.map((account) => (
-                        <MenuItem key={account.id} value={account.id}>
-                          {account.name}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                    {errors.accountId && (
-                      <Typography variant="caption" color="error" sx={{ mt: 0.5, mx: 1.75 }}>
-                        {errors.accountId.message}
+              <>
+                <Controller
+                  name="accountId"
+                  control={control}
+                  render={({ field }) => (
+                    <FormControl fullWidth error={!!errors.accountId}>
+                      <InputLabel>Conta</InputLabel>
+                      <Select {...field} label="Conta">
+                        {accounts.map((account) => (
+                          <MenuItem key={account.id} value={account.id}>
+                            {account.name}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                      {errors.accountId && (
+                        <Typography variant="caption" color="error" sx={{ mt: 0.5, mx: 1.75 }}>
+                          {errors.accountId.message}
+                        </Typography>
+                      )}
+                    </FormControl>
+                  )}
+                />
+
+                <Controller
+                  name="goalId"
+                  control={control}
+                  render={({ field }) => (
+                    <FormControl fullWidth>
+                      <InputLabel>Meta Financeira (Opcional)</InputLabel>
+                      <Select
+                        {...field}
+                        label="Meta Financeira (Opcional)"
+                      >
+                        <MenuItem value="">Nenhuma</MenuItem>
+                        {goals.map((goal) => (
+                          <MenuItem key={goal.id} value={goal.id}>
+                            <Box display="flex" alignItems="center" gap={1} width="100%">
+                              <EmojiEvents sx={{ color: 'gold', fontSize: 16 }} />
+                              <Box flex={1}>
+                                <Typography variant="body2">{goal.title}</Typography>
+                                <Typography variant="caption" color="text.secondary">
+                                  {((goal.currentAmount / goal.targetAmount) * 100).toFixed(1)}% de R$ {goal.targetAmount.toFixed(2)}
+                                </Typography>
+                              </Box>
+                            </Box>
+                          </MenuItem>
+                        ))}
+                      </Select>
+                      <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, mx: 1.75 }}>
+                        Vincule esta receita a uma meta para acompanhar o progresso automaticamente
                       </Typography>
-                    )}
-                  </FormControl>
-                )}
-              />
+                    </FormControl>
+                  )}
+                />
+              </>
             )}
 
             <Controller

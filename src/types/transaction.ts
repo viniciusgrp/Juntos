@@ -12,6 +12,7 @@ export interface Transaction {
   categoryId: string;
   accountId: string;
   creditCardId?: string;
+  goalId?: string;
   createdAt: string;
   updatedAt: string;
   category?: {
@@ -29,6 +30,10 @@ export interface Transaction {
     id: string;
     name: string;
   };
+  goal?: {
+    id: string;
+    title: string;
+  };
 }
 
 export interface CreateTransactionData {
@@ -41,6 +46,7 @@ export interface CreateTransactionData {
   categoryId: string;
   accountId: string;
   creditCardId?: string;
+  goalId?: string;
 }
 
 export interface UpdateTransactionData extends Partial<CreateTransactionData> {

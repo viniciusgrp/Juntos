@@ -5,6 +5,7 @@ import accountService, {
   TransferData,
 } from '../services/account.service';
 import { CreateAccountData, UpdateAccountData } from '../types/account';
+import { useToastContext } from '../contexts/toast.context';
 
 export const useAllAccounts = () => {
   return useQuery({
@@ -73,18 +74,25 @@ export const useAccountStats = () => {
 
 export const useCreateAccount = () => {
   const queryClient = useQueryClient();
+  const { showError, showSuccess } = useToastContext();
   
   return useMutation({
     mutationFn: (data: CreateAccountData) => accountService.createAccount(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['accounts'] });
       queryClient.invalidateQueries({ queryKey: ['account-stats'] });
+      showSuccess('Conta criada com sucesso!');
+    },
+    onError: (error: any) => {
+      const errorMessage = error.response?.data?.error || 'Erro ao criar conta';
+      showError(errorMessage);
     },
   });
 };
 
 export const useUpdateAccount = () => {
   const queryClient = useQueryClient();
+  const { showError, showSuccess } = useToastContext();
   
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateAccountData }) => 
@@ -96,30 +104,47 @@ export const useUpdateAccount = () => {
       // Invalidar queries de transações pois pode ter sido criada uma transação de ajuste
       queryClient.invalidateQueries({ queryKey: ['transactions'] });
       queryClient.invalidateQueries({ queryKey: ['transaction-stats'] });
+      showSuccess('Conta atualizada com sucesso!');
+    },
+    onError: (error: any) => {
+      const errorMessage = error.response?.data?.error || 'Erro ao atualizar conta';
+      showError(errorMessage);
     },
   });
 };
 
 export const useDeleteAccount = () => {
   const queryClient = useQueryClient();
+  const { showError, showSuccess } = useToastContext();
   
   return useMutation({
     mutationFn: (id: string) => accountService.deleteAccount(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['accounts'] });
       queryClient.invalidateQueries({ queryKey: ['account-stats'] });
+      showSuccess('Conta deletada com sucesso!');
+    },
+    onError: (error: any) => {
+      const errorMessage = error.response?.data?.error || 'Erro ao deletar conta';
+      showError(errorMessage);
     },
   });
 };
 
 export const useTransferBetweenAccounts = () => {
   const queryClient = useQueryClient();
+  const { showError, showSuccess } = useToastContext();
   
   return useMutation({
     mutationFn: (data: TransferData) => accountService.transferBetweenAccounts(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['accounts'] });
       queryClient.invalidateQueries({ queryKey: ['account-stats'] });
+      showSuccess('Transferência realizada com sucesso!');
+    },
+    onError: (error: any) => {
+      const errorMessage = error.response?.data?.error || 'Erro ao realizar transferência';
+      showError(errorMessage);
     },
   });
 };

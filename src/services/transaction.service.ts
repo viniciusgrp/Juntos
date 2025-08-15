@@ -1,6 +1,62 @@
 import api from '../lib/api';
 import { Transaction, CreateTransactionData, UpdateTransactionData } from '../types/transaction';
 
+export interface TransactionStats {
+  totalIncomes: number;
+  totalExpenses: number;
+  totalPaid: number;
+  totalPending: number;
+  currentMonthIncomes: number;
+  currentMonthExpenses: number;
+  currentMonthIncomeCount: number;
+  currentMonthExpenseCount: number;
+  balance: number;
+  topCategories: Array<{
+    categoryId: string;
+    categoryName: string;
+    total: number;
+    color?: string;
+  }>;
+}
+
+export interface DashboardStats {
+  totalBalance: number;
+  currentMonthIncomes: number;
+  currentMonthExpenses: number;
+  creditCardExpenses: number;
+  incomeChange: number;
+  expenseChange: number;
+  creditCardChange: number;
+  recentTransactions: Array<{
+    id: string;
+    description: string;
+    amount: number;
+    type: 'INCOME' | 'EXPENSE';
+    date: string;
+    category: string;
+    account?: string;
+    creditCard?: string;
+    isPaid: boolean;
+  }>;
+  categoryDistribution: Array<{
+    name: string;
+    amount: number;
+    percentage: number;
+  }>;
+  accounts: Array<{
+    id: string;
+    name: string;
+    type: string;
+    balance: number;
+  }>;
+  creditCards: Array<{
+    id: string;
+    name: string;
+    limit: number;
+    currentExpenses: number;
+  }>;
+}
+
 export interface TransactionFilters {
   type?: 'INCOME' | 'EXPENSE';
   categoryId?: string;
@@ -29,24 +85,6 @@ interface TransactionResponse {
     hasNextPage: boolean;
     hasPrevPage: boolean;
   };
-}
-
-interface TransactionStats {
-  totalIncomes: number;
-  totalExpenses: number;
-  totalPaid: number;
-  totalPending: number;
-  currentMonthIncomes: number;
-  currentMonthExpenses: number;
-  currentMonthIncomeCount: number;
-  currentMonthExpenseCount: number;
-  balance: number;
-  topCategories: Array<{
-    categoryId: string;
-    categoryName: string;
-    total: number;
-    color?: string;
-  }>;
 }
 
 class TransactionService {
@@ -91,6 +129,11 @@ class TransactionService {
 
   async getTransactionStats(): Promise<TransactionStats> {
     const response = await api.get('/transactions/stats');
+    return response.data.data;
+  }
+
+  async getDashboardStats(): Promise<DashboardStats> {
+    const response = await api.get('/transactions/dashboard');
     return response.data.data;
   }
 

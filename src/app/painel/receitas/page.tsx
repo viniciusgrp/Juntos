@@ -41,6 +41,7 @@ import {
 } from '../../../hooks/use-transactions';
 import { useAllAccounts } from '../../../hooks/use-accounts';
 import { useCategories } from '../../../hooks/use-categories';
+import { useGoals } from '../../../hooks/use-goals';
 import { Transaction, CreateTransactionData, UpdateTransactionData } from '../../../types/transaction';
 
 export default function ReceitasPage() {
@@ -57,6 +58,7 @@ export default function ReceitasPage() {
   const { data: statsData, isLoading: statsLoading } = useTransactionStats();
   const { data: accountsData } = useAllAccounts();
   const { categories } = useCategories({ type: 'INCOME' });
+  const { data: goalsData } = useGoals();
 
   const createTransactionMutation = useCreateTransaction();
   const updateTransactionMutation = useUpdateTransaction();
@@ -338,6 +340,7 @@ export default function ReceitasPage() {
         categories={categories}
         accounts={accounts}
         creditCards={creditCards}
+        goals={goalsData || []}
       />
 
       <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>

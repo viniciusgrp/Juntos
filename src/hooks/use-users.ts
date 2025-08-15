@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { AxiosError } from 'axios'
 import { api } from '@/lib/axios'
+import { useToastContext } from '../contexts/toast.context'
 import { User } from '@/types'
 
 interface CreateUserData {
@@ -25,8 +26,8 @@ export function useUserProfile() {
   return useQuery({
     queryKey: queryKeys.userProfile,
     queryFn: async () => {
-      const response = await api.get<User>('/profile')
-      return response.data
+      const response = await api.get('/auth/profile')
+      return response.data.data
     },
   })
 }
@@ -67,18 +68,23 @@ export function useUpdateUser() {
   })
 }
 
-export function useDeleteUser() {
+export function useUpdateProfile() {
   const queryClient = useQueryClient()
+  const { showError, showSuccess } = useToastContext()
 
   return useMutation({
-    mutationFn: async (id: string) => {
-      await api.delete(`/users/${id}`)
+    mutationFn: async (data: UpdateUserData) => {
+      const response = await api.put('/auth/profile', data)
+      return response.data.data
     },
-    onSuccess: (_, id) => {
-      queryClient.removeQueries({ queryKey: queryKeys.user(id) })
+    onSuccess: (data) => {
+      queryClient.setQueryData(queryKeys.userProfile, data)
+      queryClient.invalidateQueries({ queryKey: queryKeys.userProfile })
+      showSuccess('Perfil atualizado com sucesso!')
     },
-    onError: (error: AxiosError<{ message?: string }>) => {
-     console.error('Erro ao deletar usuário:', error)
+    onError: (error: AxiosError<{ error?: string }>) => {
+      const errorMessage = error.response?.data?.error || 'Erro ao atualizar perfil'
+      showError(errorMessage)
     },
   })
 }

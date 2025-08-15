@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tansta
 import transactionService, { TransactionFilters } from '../services/transaction.service';
 import { CreateTransactionData, UpdateTransactionData } from '../types/transaction';
 import { getDefaultDateFilters } from '../utils/date';
+import { useToastContext } from '../contexts/toast.context';
 
 export const useAllTransactions = () => {
   return useQuery({
@@ -145,8 +146,17 @@ export const useTransactionStats = () => {
   });
 };
 
+export const useDashboardStats = () => {
+  return useQuery({
+    queryKey: ['dashboard-stats'],
+    queryFn: () => transactionService.getDashboardStats(),
+    staleTime: 5 * 60 * 1000,
+  });
+};
+
 export const useCreateTransaction = () => {
   const queryClient = useQueryClient();
+  const { showError, showSuccess } = useToastContext();
   
   return useMutation({
     mutationFn: (data: CreateTransactionData) => transactionService.createTransaction(data),
@@ -156,12 +166,18 @@ export const useCreateTransaction = () => {
       queryClient.invalidateQueries({ queryKey: ['transaction-stats'] });
       queryClient.invalidateQueries({ queryKey: ['accounts'] });
       queryClient.invalidateQueries({ queryKey: ['account-stats'] });
+      showSuccess('Transação criada com sucesso!');
+    },
+    onError: (error: any) => {
+      const errorMessage = error.response?.data?.error || 'Erro ao criar transação';
+      showError(errorMessage);
     },
   });
 };
 
 export const useUpdateTransaction = () => {
   const queryClient = useQueryClient();
+  const { showError, showSuccess } = useToastContext();
   
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateTransactionData }) => 
@@ -173,12 +189,18 @@ export const useUpdateTransaction = () => {
       queryClient.invalidateQueries({ queryKey: ['transaction-stats'] });
       queryClient.invalidateQueries({ queryKey: ['accounts'] });
       queryClient.invalidateQueries({ queryKey: ['account-stats'] });
+      showSuccess('Transação atualizada com sucesso!');
+    },
+    onError: (error: any) => {
+      const errorMessage = error.response?.data?.error || 'Erro ao atualizar transação';
+      showError(errorMessage);
     },
   });
 };
 
 export const useDeleteTransaction = () => {
   const queryClient = useQueryClient();
+  const { showError, showSuccess } = useToastContext();
   
   return useMutation({
     mutationFn: (id: string) => transactionService.deleteTransaction(id),
@@ -188,12 +210,18 @@ export const useDeleteTransaction = () => {
       queryClient.invalidateQueries({ queryKey: ['transaction-stats'] });
       queryClient.invalidateQueries({ queryKey: ['accounts'] });
       queryClient.invalidateQueries({ queryKey: ['account-stats'] });
+      showSuccess('Transação deletada com sucesso!');
+    },
+    onError: (error: any) => {
+      const errorMessage = error.response?.data?.error || 'Erro ao deletar transação';
+      showError(errorMessage);
     },
   });
 };
 
 export const useTogglePaidStatus = () => {
   const queryClient = useQueryClient();
+  const { showError, showSuccess } = useToastContext();
   
   return useMutation({
     mutationFn: (id: string) => transactionService.togglePaidStatus(id),
@@ -204,12 +232,18 @@ export const useTogglePaidStatus = () => {
       queryClient.invalidateQueries({ queryKey: ['transaction-stats'] });
       queryClient.invalidateQueries({ queryKey: ['accounts'] });
       queryClient.invalidateQueries({ queryKey: ['account-stats'] });
+      showSuccess('Status da transação atualizado com sucesso!');
+    },
+    onError: (error: any) => {
+      const errorMessage = error.response?.data?.error || 'Erro ao atualizar status da transação';
+      showError(errorMessage);
     },
   });
 };
 
 export const useDuplicateTransaction = () => {
   const queryClient = useQueryClient();
+  const { showError, showSuccess } = useToastContext();
   
   return useMutation({
     mutationFn: (id: string) => transactionService.duplicateTransaction(id),
@@ -219,6 +253,11 @@ export const useDuplicateTransaction = () => {
       queryClient.invalidateQueries({ queryKey: ['transaction-stats'] });
       queryClient.invalidateQueries({ queryKey: ['accounts'] });
       queryClient.invalidateQueries({ queryKey: ['account-stats'] });
+      showSuccess('Transação duplicada com sucesso!');
+    },
+    onError: (error: any) => {
+      const errorMessage = error.response?.data?.error || 'Erro ao duplicar transação';
+      showError(errorMessage);
     },
   });
 };

@@ -97,15 +97,15 @@ export default function PainelLayout({ children }: PainelLayoutProps) {
     {
       text: 'Orçamento',
       icon: <Savings />,
-      path: '/painel/orcamento',
+      path: '/painel/orcamentos',
       color: 'info'
     },
-    {
-      text: 'Relatórios',
-      icon: <Assessment />,
-      path: '/painel/relatorios',
-      color: 'success'
-    },
+    // {
+    //   text: 'Relatórios',
+    //   icon: <Assessment />,
+    //   path: '/painel/relatorios', // TODOOOO
+    //   color: 'success'
+    // },
     {
       text: 'Metas Financeiras',
       icon: <AttachMoney />,
@@ -216,7 +216,7 @@ export default function PainelLayout({ children }: PainelLayoutProps) {
       <Divider />
 
       <List sx={{ px: 1 }}>
-        <ListItem disablePadding>
+        {/* <ListItem disablePadding>
           <ListItemButton
             onClick={() => handleMenuClick('/painel/configuracoes')}
             sx={{ borderRadius: 2, mx: 0.5 }}
@@ -226,7 +226,7 @@ export default function PainelLayout({ children }: PainelLayoutProps) {
             </ListItemIcon>
             {(!miniVariant || isMobile) && <ListItemText primary="Configurações" />}
           </ListItemButton>
-        </ListItem>
+        </ListItem> */}
 
         <ListItem disablePadding>
           <ListItemButton
