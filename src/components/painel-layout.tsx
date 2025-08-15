@@ -27,8 +27,6 @@ import {
   TrendingUp,
   TrendingDown,
   Category,
-  Assessment,
-  Settings,
   Person,
   Logout,
   ChevronLeft,

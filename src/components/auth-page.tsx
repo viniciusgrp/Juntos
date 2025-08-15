@@ -5,7 +5,6 @@ import { Box, Container, Typography, Avatar, Fade } from "@mui/material";
 import { AttachMoney } from "@mui/icons-material";
 import LoginForm from "./login-form";
 import RegisterForm from "./register-form";
-import ThemeToggle from "@/components/theme-toggle";
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -29,10 +28,6 @@ export default function AuthPage() {
         py: 4,
       }}
     >
-      <Box sx={{ position: "absolute", top: 16, right: 16, zIndex: 10 }}>
-        <ThemeToggle />
-      </Box>
-
       <Container maxWidth="sm">
         <Box sx={{ textAlign: "center", mb: 4 }}>
           <Avatar
