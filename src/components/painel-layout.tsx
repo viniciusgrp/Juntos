@@ -37,6 +37,7 @@ import {
 } from '@mui/icons-material'
 import { useRouter, usePathname } from 'next/navigation'
 import ThemeToggle from '@/components/theme-toggle'
+import { useTransactionStats } from '@/hooks/use-transactions'
 
 const drawerWidth = 280
 const miniDrawerWidth = 64
@@ -52,6 +53,7 @@ export default function PainelLayout({ children }: PainelLayoutProps) {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const router = useRouter()
   const pathname = usePathname()
+  const { data: stats } = useTransactionStats()
 
   const menuItems = [
     {
@@ -65,14 +67,14 @@ export default function PainelLayout({ children }: PainelLayoutProps) {
       icon: <TrendingUp />,
       path: '/painel/receitas',
       color: 'success',
-      badge: '12'
+      badge: stats?.currentMonthIncomeCount?.toString() || '0'
     },
     {
       text: 'Despesas',
       icon: <TrendingDown />,
       path: '/painel/despesas',
       color: 'error',
-      badge: '8'
+      badge: stats?.currentMonthExpenseCount?.toString() || '0'
     },
     {
       text: 'Contas Bancárias',

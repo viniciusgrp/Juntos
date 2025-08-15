@@ -17,6 +17,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { useEffect } from 'react';
 import { Account, CreateAccountData, UpdateAccountData, ACCOUNT_TYPES } from '../../types/account';
+import { formatCurrencyInput, handleCurrencyInput } from '../../utils/currency';
 
 interface AccountFormModalProps {
   open: boolean;
@@ -55,24 +56,6 @@ const AccountFormModal = ({
   error
 }: AccountFormModalProps) => {
   const isEditing = !!account;
-
-  const formatCurrency = (value: string) => {
-    const numericValue = value.replace(/\D/g, '');
-    
-    const centavos = parseInt(numericValue || '0');
-    
-    const reais = centavos / 100;
-    
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
-    }).format(reais);
-  };
-
-  const parseCurrency = (value: string) => {
-    const numericValue = value.replace(/\D/g, '');
-    return parseInt(numericValue || '0') / 100;
-  };
 
   const {
     control,
@@ -183,19 +166,17 @@ const AccountFormModal = ({
             <Controller
               name="balance"
               control={control}
-              render={({ field: { onChange, value, ...fieldProps } }) => (
+              render={({ field }) => (
                 <TextField
-                  {...fieldProps}
                   label="Saldo Inicial"
                   fullWidth
                   error={!!errors.balance}
                   helperText={errors.balance?.message}
-                  value={formatCurrency(String(value * 100))}
+                  value={formatCurrencyInput(field.value)}
                   onChange={(e) => {
-                    const numericValue = parseCurrency(e.target.value);
-                    onChange(numericValue);
+                    handleCurrencyInput(e.target.value, field.value, field.onChange);
                   }}
-                  placeholder="R$ 0,00"
+                  placeholder="0,00"
                 />
               )}
             />

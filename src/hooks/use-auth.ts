@@ -54,6 +54,23 @@ export function useRegister() {
   })
 }
 
+export function useForgotPassword() {
+  return useMutation({
+    mutationFn: async (email: string) => {
+      const response = await api.post<ApiResponse<{ message: string }>>('/auth/forgot-password', {
+        email
+      })
+      if (response.data.success && response.data.data) {
+        return response.data.data
+      }
+      throw new Error(response.data.error || 'Erro ao enviar nova senha')
+    },
+    onError: (error: AxiosError<ApiResponse<any>>) => {
+      console.error('Erro ao enviar nova senha:', error.response?.data?.error || 'Erro ao enviar nova senha')
+    },
+  })
+}
+
 export function useLogout() {
   const { logout } = useAuthStore()
   const queryClient = useQueryClient()

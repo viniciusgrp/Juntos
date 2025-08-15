@@ -37,6 +37,17 @@ export const authService = {
     }
   },
 
+  async forgotPassword(email: string): Promise<ApiResponse<{ message: string }>> {
+    try {
+      const response = await api.post<ApiResponse<{ message: string }>>('/auth/forgot-password', {
+        email,
+      });
+      return response.data;
+    } catch (error: any) {
+      throw error.response?.data || { error: 'Erro ao enviar nova senha' };
+    }
+  },
+
   logout(): void {
     localStorage.removeItem('token');
     localStorage.removeItem('refreshToken');

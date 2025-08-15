@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
 import transactionService, { TransactionFilters } from '../services/transaction.service';
 import { CreateTransactionData, UpdateTransactionData } from '../types/transaction';
+import { getDefaultDateFilters } from '../utils/date';
 
 export const useAllTransactions = () => {
   return useQuery({
@@ -151,6 +152,7 @@ export const useCreateTransaction = () => {
     mutationFn: (data: CreateTransactionData) => transactionService.createTransaction(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['transactions-infinite'] });
       queryClient.invalidateQueries({ queryKey: ['transaction-stats'] });
       queryClient.invalidateQueries({ queryKey: ['accounts'] });
       queryClient.invalidateQueries({ queryKey: ['account-stats'] });
@@ -166,6 +168,7 @@ export const useUpdateTransaction = () => {
       transactionService.updateTransaction(id, data),
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: ['transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['transactions-infinite'] });
       queryClient.invalidateQueries({ queryKey: ['transaction', id] });
       queryClient.invalidateQueries({ queryKey: ['transaction-stats'] });
       queryClient.invalidateQueries({ queryKey: ['accounts'] });
@@ -181,6 +184,7 @@ export const useDeleteTransaction = () => {
     mutationFn: (id: string) => transactionService.deleteTransaction(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['transactions-infinite'] });
       queryClient.invalidateQueries({ queryKey: ['transaction-stats'] });
       queryClient.invalidateQueries({ queryKey: ['accounts'] });
       queryClient.invalidateQueries({ queryKey: ['account-stats'] });
@@ -195,6 +199,7 @@ export const useTogglePaidStatus = () => {
     mutationFn: (id: string) => transactionService.togglePaidStatus(id),
     onSuccess: (_, id) => {
       queryClient.invalidateQueries({ queryKey: ['transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['transactions-infinite'] });
       queryClient.invalidateQueries({ queryKey: ['transaction', id] });
       queryClient.invalidateQueries({ queryKey: ['transaction-stats'] });
       queryClient.invalidateQueries({ queryKey: ['accounts'] });
@@ -210,6 +215,7 @@ export const useDuplicateTransaction = () => {
     mutationFn: (id: string) => transactionService.duplicateTransaction(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['transactions-infinite'] });
       queryClient.invalidateQueries({ queryKey: ['transaction-stats'] });
       queryClient.invalidateQueries({ queryKey: ['accounts'] });
       queryClient.invalidateQueries({ queryKey: ['account-stats'] });
@@ -218,9 +224,23 @@ export const useDuplicateTransaction = () => {
 };
 
 export const useTransactionFilters = (initialType?: 'INCOME' | 'EXPENSE') => {
-  const [filters, setFilters] = useState<TransactionFilters>(
-    initialType ? { type: initialType } : {}
-  );
+  const getDefaultFilters = () => {
+    const defaultDates = getDefaultDateFilters();
+    
+    const baseFilters: TransactionFilters = {
+      startDate: defaultDates.startDate,
+      endDate: defaultDates.endDate,
+      // Deixar contas, categorias e cartões como undefined para mostrar todos
+    };
+    
+    if (initialType) {
+      baseFilters.type = initialType;
+    }
+    
+    return baseFilters;
+  };
+
+  const [filters, setFilters] = useState<TransactionFilters>(getDefaultFilters());
   
   const updateFilter = (key: keyof TransactionFilters, value: any) => {
     setFilters(prev => ({
@@ -230,7 +250,7 @@ export const useTransactionFilters = (initialType?: 'INCOME' | 'EXPENSE') => {
   };
   
   const clearFilters = () => {
-    setFilters(initialType ? { type: initialType } : {});
+    setFilters(getDefaultFilters());
   };
   
   return {

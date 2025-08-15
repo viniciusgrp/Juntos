@@ -21,6 +21,7 @@ import {
 } from '@mui/material'
 import { Visibility, VisibilityOff } from '@mui/icons-material'
 import { useLogin } from '@/hooks/use-auth'
+import ForgotPasswordModal from './forgot-password-modal'
 
 interface LoginFormProps {
   onToggleMode: () => void
@@ -46,6 +47,7 @@ const loginSchema = yup.object().shape({
 
 export default function LoginForm({ onToggleMode }: LoginFormProps) {
   const [showPassword, setShowPassword] = useState(false)
+  const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false)
   const loginMutation = useLogin()
 
   const {
@@ -168,7 +170,13 @@ export default function LoginForm({ onToggleMode }: LoginFormProps) {
             </Button>
 
             <Box sx={{ textAlign: 'center', mt: 2 }}>
-              <Link href="#" variant="body2" color="primary">
+              <Link 
+                component="button"
+                variant="body2" 
+                color="primary"
+                onClick={() => setForgotPasswordOpen(true)}
+                type="button"
+              >
                 Esqueceu sua senha?
               </Link>
             </Box>
@@ -189,6 +197,11 @@ export default function LoginForm({ onToggleMode }: LoginFormProps) {
           </Box>
         </CardContent>
       </Card>
+
+      <ForgotPasswordModal
+        open={forgotPasswordOpen}
+        onClose={() => setForgotPasswordOpen(false)}
+      />
     </Box>
   )
 }

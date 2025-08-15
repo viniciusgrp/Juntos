@@ -38,6 +38,8 @@ interface TransactionStats {
   totalPending: number;
   currentMonthIncomes: number;
   currentMonthExpenses: number;
+  currentMonthIncomeCount: number;
+  currentMonthExpenseCount: number;
   balance: number;
   topCategories: Array<{
     categoryId: string;

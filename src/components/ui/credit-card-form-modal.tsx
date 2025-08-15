@@ -15,6 +15,7 @@ import {
 } from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
 import { CreditCard, CreateCreditCardData, UpdateCreditCardData } from '../../types/credit-card';
+import { formatCurrencyInput, handleCurrencyInput } from '../../utils/currency';
 
 interface CreditCardFormModalProps {
   open: boolean;
@@ -122,22 +123,22 @@ export default function CreditCardFormModal({
               control={control}
               rules={{ 
                 required: 'Limite é obrigatório',
-                min: { value: 1, message: 'Limite deve ser maior que zero' }
+                min: { value: 0.01, message: 'Limite deve ser maior que zero' }
               }}
-              render={({ field: { onChange, value, ...field } }) => (
+              render={({ field }) => (
                 <TextField
-                  {...field}
-                  value={value}
-                  onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
                   label="Limite"
-                  type="number"
+                  fullWidth
                   error={!!errors.limit}
                   helperText={errors.limit?.message}
                   InputProps={{
                     startAdornment: <InputAdornment position="start">R$</InputAdornment>,
-                    inputProps: { min: 0, step: 0.01 }
                   }}
-                  fullWidth
+                  value={formatCurrencyInput(field.value)}
+                  onChange={(e) => {
+                    handleCurrencyInput(e.target.value, field.value, field.onChange);
+                  }}
+                  placeholder="0,00"
                 />
               )}
             />

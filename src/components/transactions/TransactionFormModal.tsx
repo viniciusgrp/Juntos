@@ -23,6 +23,8 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { Transaction, CreateTransactionData, UpdateTransactionData } from '../../types/transaction';
 import { Category } from '../../types/category';
+import { formatCurrencyInput, handleCurrencyInput } from '../../utils/currency';
+import { formatDateForInput, getCurrentDate } from '../../utils/date';
 
 const schema = yup.object({
   description: yup.string().required('Descrição é obrigatória'),
@@ -34,7 +36,7 @@ const schema = yup.object({
     then: (schema) => schema.required('Conta é obrigatória quando não há cartão selecionado'),
     otherwise: (schema) => schema.notRequired()
   }),
-  isPaid: yup.boolean().default(false),
+  isPaid: yup.boolean().default(true),
   installments: yup.number().min(1).max(999).nullable(),
   creditCardId: yup.string().nullable()
 });
@@ -68,21 +70,6 @@ export default function TransactionFormModal({
 }: TransactionFormModalProps) {
   const isEditing = !!transaction;
 
-  const formatCurrency = (value: number | string) => {
-    let amount = 0;
-    if (typeof value === 'string') {
-      const clean = value.replace(/[^\d,]/g, '').replace(',', '.');
-      amount = Number(clean);
-    } else {
-      amount = value;
-    }
-    if (isNaN(amount)) amount = 0;
-    return amount.toLocaleString('pt-BR', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    });
-  };
-
   const parseCurrency = (value: string | number) => {
     if (typeof value === 'number') return value;
     if (!value) return 0;
@@ -100,11 +87,11 @@ export default function TransactionFormModal({
     defaultValues: {
       description: transaction?.description || '',
       amount: transaction?.amount || 0,
-      date: transaction?.date ? transaction.date.split('T')[0] : new Date().toISOString().split('T')[0],
+      date: transaction?.date ? formatDateForInput(new Date(transaction.date)) : formatDateForInput(getCurrentDate()),
       categoryId: transaction?.categoryId || '',
       accountId: transaction?.accountId || '',
       creditCardId: transaction?.creditCardId || '',
-      isPaid: transaction?.isPaid || false,
+      isPaid: transaction?.isPaid ?? true,
       installments: transaction?.installments || null
     }
   });
@@ -199,10 +186,9 @@ export default function TransactionFormModal({
                       </InputAdornment>
                     )
                   }}
-                  value={formatCurrency(field.value)}
+                  value={formatCurrencyInput(field.value)}
                   onChange={(e) => {
-                    const numericValue = parseCurrency(e.target.value);
-                    field.onChange(numericValue);
+                    handleCurrencyInput(e.target.value, field.value, field.onChange);
                   }}
                   placeholder="0,00"
                 />

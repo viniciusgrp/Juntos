@@ -93,6 +93,9 @@ export const useUpdateAccount = () => {
       queryClient.invalidateQueries({ queryKey: ['accounts'] });
       queryClient.invalidateQueries({ queryKey: ['account', id] });
       queryClient.invalidateQueries({ queryKey: ['account-stats'] });
+      // Invalidar queries de transações pois pode ter sido criada uma transação de ajuste
+      queryClient.invalidateQueries({ queryKey: ['transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['transaction-stats'] });
     },
   });
 };

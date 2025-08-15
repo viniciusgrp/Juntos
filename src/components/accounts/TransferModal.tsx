@@ -19,6 +19,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { useEffect } from 'react';
 import { Account } from '../../types/account';
+import { formatCurrencyInput, handleCurrencyInput } from '../../utils/currency';
 
 interface TransferData {
   fromAccountId: string;
@@ -201,19 +202,18 @@ const TransferModal = ({
               control={control}
               render={({ field }) => (
                 <TextField
-                  {...field}
                   label="Valor"
-                  type="number"
                   fullWidth
                   error={!!errors.amount}
                   helperText={errors.amount?.message}
                   InputProps={{
                     startAdornment: <InputAdornment position="start">R$</InputAdornment>,
-                    inputProps: { 
-                      min: 0.01, 
-                      step: 0.01 
-                    }
                   }}
+                  value={formatCurrencyInput(field.value)}
+                  onChange={(e) => {
+                    handleCurrencyInput(e.target.value, field.value, field.onChange);
+                  }}
+                  placeholder="0,00"
                 />
               )}
             />
